@@ -3,7 +3,9 @@ minetest.register_privilege("frozen", {description = "Unable to move.", give_to_
 minetest.register_privilege("hobbled", {description = "Unable to jump.", give_to_singleplayer=false})
 minetest.register_privilege("slowed", {description = "Slow moving.", give_to_singleplayer=false})
 minetest.register_privilege("unglitched", {description = "Not very glitchy...", give_to_singleplayer=false})
+minetest.register_privilege("hidden_one", {description = "Can hide from players.", give_to_singleplayer=false})
 
+--Admin Curses
 
 --prevents player from jumping.
 local function hobble(name, param)
@@ -154,4 +156,47 @@ minetest.register_chatcommand("setfree",{
         minetest.chat_send_player(param, "The curse is lifted. You have been set free!")
         minetest.chat_send_player(param, "The curse is lifted.")
     end,
+})
+
+
+
+--Other commands
+
+--hide player model and nametag (only works in 0.4.14 and above)
+vanished_players = {}
+
+minetest.register_chatcommand("vanish", {
+    params = "",
+    description = "Make user invisible",
+    privs = {hidden_one = true},
+    func = function(name, param)
+        local prop
+        local player = minetest.get_player_by_name(name)
+        vanished_players[name] = not vanished_players[name]
+        if vanished_players[name] then
+            prop = {visual_size = {x = 0, y = 0},
+            collisionbox = {0,0,0,0,0,0}}
+            player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
+        else
+            -- default player size
+            prop = {visual_size = {x = 1, y = 1},
+            collisionbox = {-0.35, -1, -0.35, 0.35, 1, 0.35}}
+            player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
+        end
+        player:set_properties(prop)
+    end
+})
+
+--announcements (only works in 0.4.14 and above)
+minetest.register_chatcommand("say", {
+    params = "<text>",
+    description = "Sends text to all players",
+    privs = {server = true},
+    func = function (name, param)
+        if not param
+        or param == "" then
+            return
+        end
+        minetest.chat_send_all(param)
+    end
 })

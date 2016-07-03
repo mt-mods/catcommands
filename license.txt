@@ -2,6 +2,9 @@
 The License for this mod is WTFPL. 
 
 This mod is by Shara RedCat.
-Thanks to RobbieF, DonBatman and Mewmon for assistance with admin curses.
+
+Thanks to:
+RobbieF, DonBatman and Mewmon for assistance with admin curses.
+tenplus1 for /vanish and /say commands. 
 
 
