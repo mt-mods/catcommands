@@ -5,38 +5,6 @@ minetest.register_privilege("slowed", {description = "Slow moving.", give_to_sin
 minetest.register_privilege("unglitched", {description = "Not very glitchy...", give_to_singleplayer=false})
 
 
---prevents player from changing speed/direction and jumping.
-local function freeze(name, param)
-    local player = minetest.get_player_by_name(param)
-    local privs=minetest.get_player_privs(param)
-    privs.frozen=true
-    minetest.set_player_privs(param,privs)
-    player:set_physics_override({jump = 0, speed = 0})
-end
-
-minetest.register_chatcommand("freeze", {
-    params = "<person>",
-    privs = {secret=true},
-    description = "Prevent player movement.",
-    func = function(name, param)
-        local player = minetest.get_player_by_name(param)
-        if player == nil then
-            minetest.chat_send_player(name,"Player does not exist")
-            return
-        end
-        freeze(name, param)
-        minetest.chat_send_player(param, "Cursed by an admin! You are now frozen!")
-        minetest.chat_send_player(name, "Curse successful!")
-    end
-})
-
-minetest.register_on_joinplayer(function(player)
-    local name = player:get_player_name()
-    if minetest.get_player_privs(name).frozen then
-        freeze(name,name)
-    end
-end)
-
 --prevents player from jumping.
 local function hobble(name, param)
     local player = minetest.get_player_by_name(param)
@@ -130,6 +98,38 @@ minetest.register_on_joinplayer(function(player)
     local name = player:get_player_name()
     if minetest.get_player_privs(name).unglitched then
         noglitch(name,name)
+    end
+end)
+
+--prevents player from changing speed/direction and jumping.
+local function freeze(name, param)
+    local player = minetest.get_player_by_name(param)
+    local privs=minetest.get_player_privs(param)
+    privs.frozen=true
+    minetest.set_player_privs(param,privs)
+    player:set_physics_override({jump = 0, speed = 0})
+end
+
+minetest.register_chatcommand("freeze", {
+    params = "<person>",
+    privs = {secret=true},
+    description = "Prevent player movement.",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(param)
+        if player == nil then
+            minetest.chat_send_player(name,"Player does not exist")
+            return
+        end
+        freeze(name, param)
+        minetest.chat_send_player(param, "Cursed by an admin! You are now frozen!")
+        minetest.chat_send_player(name, "Curse successful!")
+    end
+})
+
+minetest.register_on_joinplayer(function(player)
+    local name = player:get_player_name()
+    if minetest.get_player_privs(name).frozen then
+        freeze(name,name)
     end
 end)
 
