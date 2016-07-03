@@ -39,11 +39,11 @@ end)
 
 --reduces player movement speed
 local function slowmo(name, param)
-        local player = minetest.get_player_by_name(param)
-        local privs=minetest.get_player_privs(param)
-        privs.slowed=true
-        minetest.set_player_privs(param,privs)
-        player:set_physics_override({speed = 0.3})
+    local player = minetest.get_player_by_name(param)
+    local privs=minetest.get_player_privs(param)
+    privs.slowed=true
+    minetest.set_player_privs(param,privs)
+    player:set_physics_override({speed = 0.3})
 end
 
 minetest.register_chatcommand("slowmo", {
@@ -71,11 +71,11 @@ end)
 
 --disable sneak glitch for the player.
 local function noglitch(name, param)
-        local player = minetest.get_player_by_name(param)
-        local privs=minetest.get_player_privs(param)
-        privs.unglitched=true
-        minetest.set_player_privs(param,privs)
-        player:set_physics_override({sneak = false})
+    local player = minetest.get_player_by_name(param)
+    local privs=minetest.get_player_privs(param)
+    privs.unglitched=true
+    minetest.set_player_privs(param,privs)
+    player:set_physics_override({sneak = false})
 end
 
 minetest.register_chatcommand("noglitch", {
