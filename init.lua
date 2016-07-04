@@ -5,6 +5,7 @@ minetest.register_privilege("slowed", {description = "Slow moving.", give_to_sin
 minetest.register_privilege("unglitched", {description = "Not very glitchy...", give_to_singleplayer=false})
 minetest.register_privilege("hidden_one", {description = "Can hide from players.", give_to_singleplayer=false})
 
+
 --Admin Curses
 
 --prevents player from jumping.
@@ -42,8 +43,8 @@ end)
 --reduces player movement speed
 local function slowmo(name, param)
     local player = minetest.get_player_by_name(param)
-    local privs=minetest.get_player_privs(param)
-    privs.slowed=true
+    local privs = minetest.get_player_privs(param)
+    privs.slowed = true
     minetest.set_player_privs(param,privs)
     player:set_physics_override({speed = 0.3})
 end
@@ -160,7 +161,68 @@ minetest.register_chatcommand("setfree",{
 
 
 
---Other commands
+--Cage Commands
+
+--put a player in the cage
+minetest.register_chatcommand("cage", {
+    params = "<person>",
+    privs = {secret=true},
+    description = "Put a player in the cage.",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(param)
+        if player == nil then
+            minetest.chat_send_player(name,"Player does not exist")
+            return
+        end
+        local privs = minetest.get_player_privs(param)
+        privs.interact=nil
+        privs.spawn=nil
+        privs.home=nil
+        privs.fly=nil
+        privs.fast=nil
+        minetest.set_player_privs(param,privs)
+        noglitch(name, param)
+        local cagepos = minetest.setting_get_pos("cage_coordinate")
+        if not cagepos then
+            minetest.chat_send_player(name, "No cage set...")
+            return false
+        end
+        player:setpos(cagepos)
+    end
+})
+
+--free a player from the cage
+minetest.register_chatcommand("uncage", {
+    params = "<person>",
+    privs = {secret=true},
+    description = "Free a player from the cage.",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(param)
+        if player == nil then
+            minetest.chat_send_player(name,"Player does not exist")
+            return
+        end
+        local privs = minetest.get_player_privs(param)
+        privs.interact=true
+        privs.spawn=true
+        privs.home=true
+        privs.fly=true
+        privs.fast=true
+        privs.unglitched=nil
+        minetest.set_player_privs(param,privs)
+        player:set_physics_override({sneak = true})
+        local spawnpos = minetest.setting_get_pos("static_spawnpoint")
+        if not spawnpos then
+            minetest.chat_send_player(name, "No spawn point set...")
+            return false
+        end
+        player:setpos(spawnpos)
+    end
+})
+
+
+
+--Other Commands
 
 --hide player model and nametag (only works in 0.4.14 and above)
 vanished_players = {}
