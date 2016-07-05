@@ -33,13 +33,6 @@ minetest.register_chatcommand("hobble", {
     end
 })
 
-minetest.register_on_joinplayer(function(player)
-    local name = player:get_player_name()
-    if minetest.get_player_privs(name).hobbled then
-        hobble(name,name)
-    end
-end)
-
 --reduces player movement speed
 local function slowmo(name, param)
     local player = minetest.get_player_by_name(param)
@@ -64,13 +57,6 @@ minetest.register_chatcommand("slowmo", {
         minetest.chat_send_player(name, "Curse successful!")
     end
 })
-
-minetest.register_on_joinplayer(function(player)
-    local name = player:get_player_name()
-    if minetest.get_player_privs(name).slowed then
-        slowmo(name,name)
-    end
-end)
 
 --disable sneak glitch for the player.
 local function noglitch(name, param)
@@ -97,13 +83,6 @@ minetest.register_chatcommand("noglitch", {
     end
 })
 
-minetest.register_on_joinplayer(function(player)
-    local name = player:get_player_name()
-    if minetest.get_player_privs(name).unglitched then
-        noglitch(name,name)
-    end
-end)
-
 --prevents player from changing speed/direction and jumping.
 local function freeze(name, param)
     local player = minetest.get_player_by_name(param)
@@ -129,12 +108,24 @@ minetest.register_chatcommand("freeze", {
     end
 })
 
+--trigger curse effects when player joins
 minetest.register_on_joinplayer(function(player)
     local name = player:get_player_name()
+    if minetest.get_player_privs(name).hobbled then
+        hobble(name,name)
+    end
+     if minetest.get_player_privs(name).slowed then
+        slowmo(name,name)
+    end
+     if minetest.get_player_privs(name).unglitched then
+        noglitch(name,name)
+    end    
     if minetest.get_player_privs(name).frozen then
         freeze(name,name)
-    end
+    end  
 end)
+
+
 
 --reset player physics.
 minetest.register_chatcommand("setfree",{
