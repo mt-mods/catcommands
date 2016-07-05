@@ -146,7 +146,7 @@ minetest.register_chatcommand("setfree",{
         minetest.set_player_privs(param,privs)
         player:set_physics_override({jump = 1, speed = 1, sneak = true})
         minetest.chat_send_player(param, "The curse is lifted. You have been set free!")
-        minetest.chat_send_player(param, "The curse is lifted.")
+        minetest.chat_send_player(name, "The curse is lifted.")
     end,
 })
 
