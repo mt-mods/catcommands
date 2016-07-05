@@ -114,15 +114,15 @@ minetest.register_on_joinplayer(function(player)
     if minetest.get_player_privs(name).hobbled then
         hobble(name,name)
     end
-     if minetest.get_player_privs(name).slowed then
+    if minetest.get_player_privs(name).slowed then
         slowmo(name,name)
     end
-     if minetest.get_player_privs(name).unglitched then
+    if minetest.get_player_privs(name).unglitched then
         noglitch(name,name)
-    end    
+    end
     if minetest.get_player_privs(name).frozen then
         freeze(name,name)
-    end  
+    end
 end)
 
 
