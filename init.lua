@@ -300,6 +300,11 @@ minetest.register_chatcommand("proclaim", {
             return
         end
         minetest.chat_send_all(param)
+        if minetest.get_modpath("irc") then 
+            if irc.connected and irc.config.send_join_part then
+                irc:say(param)
+            end
+        end
     end
 })
 
