@@ -290,7 +290,7 @@ minetest.register_chatcommand("vanish", {
 })
 
 --announcements.
-minetest.register_chatcommand("say", {
+minetest.register_chatcommand("proclaim", {
     params = "<text>",
     description = "Sends text to all players",
     privs = {server = true},
