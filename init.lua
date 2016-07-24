@@ -260,6 +260,20 @@ minetest.register_chatcommand("uncage", {
     end
 })
 
+-- list caged players
+minetest.register_chatcommand("list_caged", {
+    params = "",
+    description = "List all caged players.",
+    privs = {server = true},
+    func = function (_, _)
+        local players = ""
+        for player, _ in pairs(priv_table) do
+            players = players .. player .. ", "
+        end
+        return true, "Currently caged players: " .. players
+    end
+})
+
 
 
 --Other Commands
