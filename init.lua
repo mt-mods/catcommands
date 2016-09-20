@@ -242,10 +242,10 @@ minetest.register_chatcommand("uncage", {
             minetest.chat_send_player(warden_name,"This player is not caged")
             return
         end
-        --get spawn point position from config or return.
-        local spawnpos = minetest.setting_get_pos("static_spawnpoint")
-        if not spawnpos then
-            minetest.chat_send_player(warden_name, "No spawn point set...")
+        --get release position from config or return.
+        local releasepos = minetest.setting_get_pos("release_coordinate")
+        if not releasepos then
+            minetest.chat_send_player(warden_name, "No release point set...")
             return
         end
         --get target's original privs from table and restore them.
@@ -254,9 +254,9 @@ minetest.register_chatcommand("uncage", {
         --remove entry for target from table and save to file.
         priv_table[target_name] = nil
         table_save()
-        --restore sneak and move target to spawn.
+        --restore sneak and move target to release point.
         target:set_physics_override({sneak = true})
-        target:setpos(spawnpos)
+        target:setpos(releasepos)
     end
 })
 
