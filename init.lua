@@ -8,10 +8,16 @@ minetest.register_privilege("hidden_one", {description = "Can hide from players.
 
 
 
---Admin Curses
+-- Admin Curses
 
---prevents player from jumping.
+-- prevents player from jumping
 local function hobble(name, param)
+    -- return if player is admin
+    local admin_name  = minetest.setting_get ("name")
+    if name == admin_name then
+        return
+    end
+    -- apply curse
     local player = minetest.get_player_by_name(param)
     local privs=minetest.get_player_privs(param)
     privs.hobbled=true
@@ -35,8 +41,14 @@ minetest.register_chatcommand("hobble", {
     end
 })
 
---reduces player movement speed.
+-- reduces player movement speed
 local function slowmo(name, param)
+    -- return if player is admin
+    local admin_name  = minetest.setting_get ("name")
+    if name == admin_name then
+        return
+    end
+    -- apply curse
     local player = minetest.get_player_by_name(param)
     local privs = minetest.get_player_privs(param)
     privs.slowed = true
@@ -60,8 +72,14 @@ minetest.register_chatcommand("slowmo", {
     end
 })
 
---disable sneak glitch for the player.
+-- disable sneak glitch for the player
 local function noglitch(name, param)
+    -- return if player is admin
+    local admin_name  = minetest.setting_get ("name")
+    if name == admin_name then
+        return
+    end
+    -- apply curse
     local player = minetest.get_player_by_name(param)
     local privs=minetest.get_player_privs(param)
     privs.unglitched=true
@@ -85,8 +103,14 @@ minetest.register_chatcommand("noglitch", {
     end
 })
 
---prevent player from changing speed/direction and jumping.
+-- prevent player from changing speed/direction and jumping
 local function freeze(name, param)
+    -- return if player is admin
+    local admin_name  = minetest.setting_get ("name")
+    if name == admin_name then
+        return
+    end
+    -- apply curse
     local player = minetest.get_player_by_name(param)
     local privs=minetest.get_player_privs(param)
     privs.frozen=true
@@ -110,7 +134,7 @@ minetest.register_chatcommand("freeze", {
     end
 })
 
---trigger curse effects when player joins.
+-- trigger curse effects when player joins
 minetest.register_on_joinplayer(function(player)
     local name = player:get_player_name()
     if minetest.get_player_privs(name).hobbled then
@@ -127,7 +151,7 @@ minetest.register_on_joinplayer(function(player)
     end
 end)
 
---reset player physics.
+-- reset player physics
 minetest.register_chatcommand("setfree",{
     params = "<person>",
     privs = {secret=true},
@@ -152,11 +176,11 @@ minetest.register_chatcommand("setfree",{
 
 
 
---Cage Commands
+-- Cage Commands
 
 local priv_table = {}
 
---save table to file.
+-- save table to file
 local function table_save()
     local data = priv_table
     local f, err = io.open(minetest.get_worldpath() .. "/curse_priv_table.txt", "w")
@@ -167,7 +191,7 @@ local function table_save()
     f:close()
 end
 
---read saved file.
+-- read saved file
 local function table_read()
     local f, err = io.open(minetest.get_worldpath() .. "/curse_priv_table.txt", "r")
     local data = minetest.deserialize(f:read("*a"))
@@ -189,72 +213,72 @@ minetest.register_on_shutdown(function()
 end)
 
 
---put a player in the cage.
+-- put a player in the cage
 minetest.register_chatcommand("cage", {
     params = "<person>",
     privs = {secret=true},
     description = "Put a player in the cage.",
     func = function(warden_name, target_name)
-        --get target player or return.
+        -- get target player or return
         local target = minetest.get_player_by_name(target_name)
         if not target then
             minetest.chat_send_player(warden_name,"Player does not exist")
             return
         end
-        --get target player's privs or return.
+        -- get target player's privs or return
         local privs = minetest.get_player_privs(target_name)
         if privs.caged == true then
             minetest.chat_send_player(warden_name,"This player is already caged")
             return
         end
-        --get cage position from config or return.
+        -- get cage position from config or return
         local cagepos = minetest.setting_get_pos("cage_coordinate")
         if not cagepos then
             minetest.chat_send_player(warden_name, "No cage set...")
             return
         end
-        --add current target privs to table and save to file.
+        -- add current target privs to table and save to file
         priv_table[target_name] = privs
         table_save()
-        --remove all privs but shout and add caged and unglitched.
+        -- remove all privs but shout and add caged and unglitched
         minetest.set_player_privs(target_name,{shout = true, caged = true})
         noglitch(warden_name, target_name)
-        --move target to cage location.
+        -- move target to cage location
         target:setpos(cagepos)
     end
 })
 
---free a player from the cage.
+-- free a player from the cage
 minetest.register_chatcommand("uncage", {
     params = "<person>",
     privs = {secret=true},
     description = "Free a player from the cage.",
     func = function(warden_name, target_name)
-        --get target player or return.
+        -- get target player or return
         local target = minetest.get_player_by_name(target_name)
         if not target then
             minetest.chat_send_player(warden_name,"Player does not exist")
             return
         end
-        --get target player's privs or return.
+        -- get target player's privs or return
         local privs = minetest.get_player_privs(target_name)
         if privs.caged ~= true then
             minetest.chat_send_player(warden_name,"This player is not caged")
             return
         end
-        --get release position from config or return.
+        -- get release position from config or return
         local releasepos = minetest.setting_get_pos("release_coordinate")
         if not releasepos then
             minetest.chat_send_player(warden_name, "No release point set...")
             return
         end
-        --get target's original privs from table and restore them.
+        -- get target's original privs from table and restore them
         local original_privs = priv_table[target_name]
         minetest.set_player_privs(target_name,original_privs)
-        --remove entry for target from table and save to file.
+        -- remove entry for target from table and save to file
         priv_table[target_name] = nil
         table_save()
-        --restore sneak and move target to release point.
+        -- restore sneak and move target to release point
         target:set_physics_override({sneak = true})
         target:setpos(releasepos)
     end
@@ -276,9 +300,9 @@ minetest.register_chatcommand("list_caged", {
 
 
 
---Other Commands
+-- Other Commands
 
---hide player model and nametag (only works in 0.4.14 and above).
+-- hide player model and nametag (only works in 0.4.14 and above)
 vanished_players = {}
 
 minetest.register_chatcommand("vanish", {
@@ -303,7 +327,7 @@ minetest.register_chatcommand("vanish", {
     end
 })
 
---announcements.
+-- announcements
 minetest.register_chatcommand("proclaim", {
     params = "<text>",
     description = "Sends text to all players",
@@ -324,3 +348,5 @@ minetest.register_chatcommand("proclaim", {
 
 
 
+local modpath = minetest.get_modpath(minetest.get_current_modname())
+dofile(modpath.."/bound.lua")
