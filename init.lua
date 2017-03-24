@@ -3,6 +3,7 @@ minetest.register_privilege("frozen", {description = "Unable to move.", give_to_
 minetest.register_privilege("hobbled", {description = "Unable to jump.", give_to_singleplayer=false})
 minetest.register_privilege("slowed", {description = "Slow moving.", give_to_singleplayer=false})
 minetest.register_privilege("unglitched", {description = "Not very glitchy...", give_to_singleplayer=false})
+minetest.register_privilege("lost", {description = "Not allowed to use minimap.", give_to_singleplayer=false})
 minetest.register_privilege("caged", {description = "Not going anywhere...", give_to_singleplayer=false})
 minetest.register_privilege("hidden_one", {description = "Can hide from players.", give_to_singleplayer=false})
 
@@ -134,6 +135,38 @@ minetest.register_chatcommand("freeze", {
     end
 })
 
+-- disables minimap for player
+local function getlost(name,param)
+    -- return if player is admin
+    local admin_name  = minetest.setting_get ("name")
+    if name == admin_name then
+        return
+    end
+    -- apply curse
+    local player = minetest.get_player_by_name(param)
+    local privs = minetest.get_player_privs(param)
+    privs.lost = true
+    minetest.set_player_privs(param,privs)
+    player:hud_set_flags({minimap = false})
+end
+
+minetest.register_chatcommand("getlost", {
+    params = "<person>",
+    privs = {secret=true},
+    description = "Prevent player from using the minimap.",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(param)
+        if player == nil then
+            minetest.chat_send_player(name,"Player does not exist")
+            return
+        end
+        getlost(name,param)
+        minetest.chat_send_player(param, "Cursed by an admin! You will get lost now!")
+        minetest.chat_send_player(name, "Curse successful!")
+    end
+})
+
+
 -- trigger curse effects when player joins
 minetest.register_on_joinplayer(function(player)
     local name = player:get_player_name()
@@ -148,6 +181,9 @@ minetest.register_on_joinplayer(function(player)
     end
     if minetest.get_player_privs(name).frozen then
         freeze(name,name)
+    end
+    if minetest.get_player_privs(name).lost then
+        player:hud_set_flags({minimap = false})
     end
 end)
 
@@ -167,8 +203,10 @@ minetest.register_chatcommand("setfree",{
         privs.hobbled=nil
         privs.slowed=nil
         privs.unglitched=nil
+        privs.lost=nil
         minetest.set_player_privs(param,privs)
         player:set_physics_override({jump = 1, speed = 1, sneak = true})
+        player:hud_set_flags({minimap = true})
         minetest.chat_send_player(param, "The curse is lifted. You have been set free!")
         minetest.chat_send_player(name, "The curse is lifted.")
     end,
