@@ -257,6 +257,11 @@ minetest.register_chatcommand("cage", {
     privs = {secret=true},
     description = "Put a player in the cage.",
     func = function(warden_name, target_name)
+        --prevent self-caging
+        if warden_name == target_name then
+            minetest.chat_send_player(warden_name,"You can't cage yourself")
+            return
+        end
         -- get target player or return
         local target = minetest.get_player_by_name(target_name)
         if not target then
