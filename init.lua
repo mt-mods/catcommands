@@ -27,7 +27,7 @@ local function hobble(user, target)
 end
 
 minetest.register_chatcommand("hobble", {
-    targets = "<person>",
+    params = "<person>",
     privs = {secret=true},
     description = "Prevent player jumping.",
     func = function(name, target)
@@ -58,7 +58,7 @@ local function slowmo(name, target)
 end
 
 minetest.register_chatcommand("slowmo", {
-    targets = "<person>",
+    params = "<person>",
     privs = {secret=true},
     description = "Reduce player movement speed.",
     func = function(name, target)
@@ -89,7 +89,7 @@ local function noglitch(name, target)
 end
 
 minetest.register_chatcommand("noglitch", {
-    targets = "<person>",
+    params = "<person>",
     privs = {secret=true},
     description = "Disable sneak glitch for a player.",
     func = function(name, target)
@@ -120,7 +120,7 @@ local function freeze(name, target)
 end
 
 minetest.register_chatcommand("freeze", {
-    targets = "<person>",
+    params = "<person>",
     privs = {secret=true},
     description = "Prevent player movement.",
     func = function(name, target)
@@ -151,7 +151,7 @@ local function getlost(name,target)
 end
 
 minetest.register_chatcommand("getlost", {
-    targets = "<person>",
+    params = "<person>",
     privs = {secret=true},
     description = "Prevent player from using the minimap.",
     func = function(name, target)
@@ -189,7 +189,7 @@ end)
 
 -- reset player physics
 minetest.register_chatcommand("setfree",{
-    targets = "<person>",
+    params = "<person>",
     privs = {secret=true},
     description = "Reset player movement.",
     func = function(name, target)
@@ -253,7 +253,7 @@ end)
 
 -- put a player in the cage
 minetest.register_chatcommand("cage", {
-    targets = "<person>",
+    params = "<person>",
     privs = {secret=true},
     description = "Put a player in the cage.",
     func = function(warden_name, target_name)
@@ -293,7 +293,7 @@ minetest.register_chatcommand("cage", {
 
 -- free a player from the cage
 minetest.register_chatcommand("uncage", {
-    targets = "<person>",
+    params = "<person>",
     privs = {secret=true},
     description = "Free a player from the cage.",
     func = function(warden_name, target_name)
@@ -329,7 +329,7 @@ minetest.register_chatcommand("uncage", {
 
 -- list caged players
 minetest.register_chatcommand("list_caged", {
-    targets = "",
+    params = "",
     description = "List all caged players.",
     privs = {server = true},
     func = function (_, _)
@@ -349,7 +349,7 @@ minetest.register_chatcommand("list_caged", {
 vanished_players = {}
 
 minetest.register_chatcommand("vanish", {
-    targets = "",
+    params = "",
     description = "Make user invisible",
     privs = {hidden_one = true},
     func = function(user)
@@ -372,7 +372,7 @@ minetest.register_chatcommand("vanish", {
 
 -- announcements
 minetest.register_chatcommand("proclaim", {
-    targets = "<text>",
+    params = "<text>",
     description = "Sends text to all players",
     privs = {server = true},
     func = function (user, text)
