@@ -15,7 +15,7 @@ minetest.register_privilege("hidden_one", {description = "Can hide from players.
 local function hobble(name, param)
     -- return if player is admin
     local admin_name  = minetest.setting_get ("name")
-    if name == admin_name then
+    if param == admin_name then
         return
     end
     -- apply curse
@@ -46,7 +46,7 @@ minetest.register_chatcommand("hobble", {
 local function slowmo(name, param)
     -- return if player is admin
     local admin_name  = minetest.setting_get ("name")
-    if name == admin_name then
+    if param == admin_name then
         return
     end
     -- apply curse
@@ -77,7 +77,7 @@ minetest.register_chatcommand("slowmo", {
 local function noglitch(name, param)
     -- return if player is admin
     local admin_name  = minetest.setting_get ("name")
-    if name == admin_name then
+    if param == admin_name then
         return
     end
     -- apply curse
@@ -108,7 +108,7 @@ minetest.register_chatcommand("noglitch", {
 local function freeze(name, param)
     -- return if player is admin
     local admin_name  = minetest.setting_get ("name")
-    if name == admin_name then
+    if param == admin_name then
         return
     end
     -- apply curse
@@ -139,7 +139,7 @@ minetest.register_chatcommand("freeze", {
 local function getlost(name,param)
     -- return if player is admin
     local admin_name  = minetest.setting_get ("name")
-    if name == admin_name then
+    if param == admin_name then
         return
     end
     -- apply curse
