@@ -12,156 +12,156 @@ minetest.register_privilege("hidden_one", {description = "Can hide from players.
 -- Admin Curses
 
 -- prevents player from jumping
-local function hobble(name, param)
+local function hobble(user, target)
     -- return if player is admin
     local admin_name  = minetest.setting_get ("name")
-    if param == admin_name then
+    if target == admin_name then
         return
     end
     -- apply curse
-    local player = minetest.get_player_by_name(param)
-    local privs=minetest.get_player_privs(param)
+    local player = minetest.get_player_by_name(target)
+    local privs=minetest.get_player_privs(target)
     privs.hobbled=true
-    minetest.set_player_privs(param,privs)
+    minetest.set_player_privs(target,privs)
     player:set_physics_override({jump = 0})
 end
 
 minetest.register_chatcommand("hobble", {
-    params = "<person>",
+    targets = "<person>",
     privs = {secret=true},
     description = "Prevent player jumping.",
-    func = function(name, param)
-        local player = minetest.get_player_by_name(param)
+    func = function(name, target)
+        local player = minetest.get_player_by_name(target)
         if player == nil then
             minetest.chat_send_player(name,"Player does not exist")
             return
         end
-        hobble(name,param)
-        minetest.chat_send_player(param, "Cursed by an admin! No more jumping!")
+        hobble(name,target)
+        minetest.chat_send_player(target, "Cursed by an admin! No more jumping!")
         minetest.chat_send_player(name, "Curse successful!")
     end
 })
 
 -- reduces player movement speed
-local function slowmo(name, param)
+local function slowmo(name, target)
     -- return if player is admin
     local admin_name  = minetest.setting_get ("name")
-    if param == admin_name then
+    if target == admin_name then
         return
     end
     -- apply curse
-    local player = minetest.get_player_by_name(param)
-    local privs = minetest.get_player_privs(param)
+    local player = minetest.get_player_by_name(target)
+    local privs = minetest.get_player_privs(target)
     privs.slowed = true
-    minetest.set_player_privs(param,privs)
+    minetest.set_player_privs(target,privs)
     player:set_physics_override({speed = 0.3})
 end
 
 minetest.register_chatcommand("slowmo", {
-    params = "<person>",
+    targets = "<person>",
     privs = {secret=true},
     description = "Reduce player movement speed.",
-    func = function(name, param)
-        local player = minetest.get_player_by_name(param)
+    func = function(name, target)
+        local player = minetest.get_player_by_name(target)
         if player == nil then
             minetest.chat_send_player(name,"Player does not exist") 
             return
         end
-        slowmo(name,param)
-        minetest.chat_send_player(param, "Cursed by an admin! You feel sloooooow!")
+        slowmo(name,target)
+        minetest.chat_send_player(target, "Cursed by an admin! You feel sloooooow!")
         minetest.chat_send_player(name, "Curse successful!")
     end
 })
 
 -- disable sneak glitch for the player
-local function noglitch(name, param)
+local function noglitch(name, target)
     -- return if player is admin
     local admin_name  = minetest.setting_get ("name")
-    if param == admin_name then
+    if target == admin_name then
         return
     end
     -- apply curse
-    local player = minetest.get_player_by_name(param)
-    local privs=minetest.get_player_privs(param)
+    local player = minetest.get_player_by_name(target)
+    local privs=minetest.get_player_privs(target)
     privs.unglitched=true
-    minetest.set_player_privs(param,privs)
+    minetest.set_player_privs(target,privs)
     player:set_physics_override({sneak = false})
 end
 
 minetest.register_chatcommand("noglitch", {
-    params = "<person>",
+    targets = "<person>",
     privs = {secret=true},
     description = "Disable sneak glitch for a player.",
-    func = function(name, param)
-        local player = minetest.get_player_by_name(param)
+    func = function(name, target)
+        local player = minetest.get_player_by_name(target)
         if player == nil then
             minetest.chat_send_player(name,"Player does not exist")
             return
         end
-        noglitch(name, param)
-        minetest.chat_send_player(param, "Cursed by an admin! You feel less glitchy...")
+        noglitch(name, target)
+        minetest.chat_send_player(target, "Cursed by an admin! You feel less glitchy...")
         minetest.chat_send_player(name, "Curse successful!")
     end
 })
 
 -- prevent player from changing speed/direction and jumping
-local function freeze(name, param)
+local function freeze(name, target)
     -- return if player is admin
     local admin_name  = minetest.setting_get ("name")
-    if param == admin_name then
+    if target == admin_name then
         return
     end
     -- apply curse
-    local player = minetest.get_player_by_name(param)
-    local privs=minetest.get_player_privs(param)
+    local player = minetest.get_player_by_name(target)
+    local privs=minetest.get_player_privs(target)
     privs.frozen=true
-    minetest.set_player_privs(param,privs)
+    minetest.set_player_privs(target,privs)
     player:set_physics_override({jump = 0, speed = 0})
 end
 
 minetest.register_chatcommand("freeze", {
-    params = "<person>",
+    targets = "<person>",
     privs = {secret=true},
     description = "Prevent player movement.",
-    func = function(name, param)
-        local player = minetest.get_player_by_name(param)
+    func = function(name, target)
+        local player = minetest.get_player_by_name(target)
         if player == nil then
             minetest.chat_send_player(name,"Player does not exist")
             return
         end
-        freeze(name, param)
-        minetest.chat_send_player(param, "Cursed by an admin! You are now frozen!")
+        freeze(name, target)
+        minetest.chat_send_player(target, "Cursed by an admin! You are now frozen!")
         minetest.chat_send_player(name, "Curse successful!")
     end
 })
 
 -- disables minimap for player
-local function getlost(name,param)
+local function getlost(name,target)
     -- return if player is admin
     local admin_name  = minetest.setting_get ("name")
-    if param == admin_name then
+    if target == admin_name then
         return
     end
     -- apply curse
-    local player = minetest.get_player_by_name(param)
-    local privs = minetest.get_player_privs(param)
+    local player = minetest.get_player_by_name(target)
+    local privs = minetest.get_player_privs(target)
     privs.lost = true
-    minetest.set_player_privs(param,privs)
+    minetest.set_player_privs(target,privs)
     player:hud_set_flags({minimap = false})
 end
 
 minetest.register_chatcommand("getlost", {
-    params = "<person>",
+    targets = "<person>",
     privs = {secret=true},
     description = "Prevent player from using the minimap.",
-    func = function(name, param)
-        local player = minetest.get_player_by_name(param)
+    func = function(name, target)
+        local player = minetest.get_player_by_name(target)
         if player == nil then
             minetest.chat_send_player(name,"Player does not exist")
             return
         end
-        getlost(name,param)
-        minetest.chat_send_player(param, "Cursed by an admin! You will get lost now!")
+        getlost(name,target)
+        minetest.chat_send_player(target, "Cursed by an admin! You will get lost now!")
         minetest.chat_send_player(name, "Curse successful!")
     end
 })
@@ -189,25 +189,25 @@ end)
 
 -- reset player physics
 minetest.register_chatcommand("setfree",{
-    params = "<person>",
+    targets = "<person>",
     privs = {secret=true},
     description = "Reset player movement.",
-    func = function(name, param)
-        local player = minetest.get_player_by_name(param)
+    func = function(name, target)
+        local player = minetest.get_player_by_name(target)
         if player == nil then 
             minetest.chat_send_player(name,"Player does not exist")
             return
         end
-        local privs=minetest.get_player_privs(param)
+        local privs=minetest.get_player_privs(target)
         privs.frozen=nil
         privs.hobbled=nil
         privs.slowed=nil
         privs.unglitched=nil
         privs.lost=nil
-        minetest.set_player_privs(param,privs)
+        minetest.set_player_privs(target,privs)
         player:set_physics_override({jump = 1, speed = 1, sneak = true})
         player:hud_set_flags({minimap = true})
-        minetest.chat_send_player(param, "The curse is lifted. You have been set free!")
+        minetest.chat_send_player(target, "The curse is lifted. You have been set free!")
         minetest.chat_send_player(name, "The curse is lifted.")
     end,
 })
@@ -253,7 +253,7 @@ end)
 
 -- put a player in the cage
 minetest.register_chatcommand("cage", {
-    params = "<person>",
+    targets = "<person>",
     privs = {secret=true},
     description = "Put a player in the cage.",
     func = function(warden_name, target_name)
@@ -293,7 +293,7 @@ minetest.register_chatcommand("cage", {
 
 -- free a player from the cage
 minetest.register_chatcommand("uncage", {
-    params = "<person>",
+    targets = "<person>",
     privs = {secret=true},
     description = "Free a player from the cage.",
     func = function(warden_name, target_name)
@@ -329,7 +329,7 @@ minetest.register_chatcommand("uncage", {
 
 -- list caged players
 minetest.register_chatcommand("list_caged", {
-    params = "",
+    targets = "",
     description = "List all caged players.",
     privs = {server = true},
     func = function (_, _)
@@ -349,14 +349,14 @@ minetest.register_chatcommand("list_caged", {
 vanished_players = {}
 
 minetest.register_chatcommand("vanish", {
-    params = "",
+    targets = "",
     description = "Make user invisible",
     privs = {hidden_one = true},
-    func = function(name, param)
+    func = function(user)
         local prop
-        local player = minetest.get_player_by_name(name)
-        vanished_players[name] = not vanished_players[name]
-        if vanished_players[name] then
+        local player = minetest.get_player_by_name(user)
+        vanished_players[user] = not vanished_players[user]
+        if vanished_players[user] then
             prop = {visual_size = {x = 0, y = 0},
             collisionbox = {0,0,0,0,0,0}}
             player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
@@ -372,18 +372,18 @@ minetest.register_chatcommand("vanish", {
 
 -- announcements
 minetest.register_chatcommand("proclaim", {
-    params = "<text>",
+    targets = "<text>",
     description = "Sends text to all players",
     privs = {server = true},
-    func = function (name, param)
-        if not param
-        or param == "" then
+    func = function (user, text)
+        if not text
+        or text == "" then
             return
         end
-        minetest.chat_send_all(param)
+        minetest.chat_send_all(text)
         if minetest.get_modpath("irc") then 
             if irc.connected and irc.config.send_join_part then
-                irc:say(param)
+                irc:say(text)
             end
         end
     end
