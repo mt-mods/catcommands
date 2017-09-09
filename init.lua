@@ -20,8 +20,8 @@ local function hobble(user, target)
     end
     -- apply curse
     local player = minetest.get_player_by_name(target)
-    local privs=minetest.get_player_privs(target)
-    privs.hobbled=true
+    local privs = minetest.get_player_privs(target)
+    privs.hobbled = true
     minetest.set_player_privs(target,privs)
     player:set_physics_override({jump = 0})
 end
@@ -36,7 +36,7 @@ minetest.register_chatcommand("hobble", {
             minetest.chat_send_player(name,"Player does not exist")
             return
         end
-        hobble(name,target)
+        hobble(name, target)
         minetest.chat_send_player(target, "Cursed by an admin! No more jumping!")
         minetest.chat_send_player(name, "Curse successful!")
     end
@@ -53,7 +53,7 @@ local function slowmo(name, target)
     local player = minetest.get_player_by_name(target)
     local privs = minetest.get_player_privs(target)
     privs.slowed = true
-    minetest.set_player_privs(target,privs)
+    minetest.set_player_privs(target, privs)
     player:set_physics_override({speed = 0.3})
 end
 
@@ -82,9 +82,9 @@ local function noglitch(name, target)
     end
     -- apply curse
     local player = minetest.get_player_by_name(target)
-    local privs=minetest.get_player_privs(target)
-    privs.unglitched=true
-    minetest.set_player_privs(target,privs)
+    local privs = minetest.get_player_privs(target)
+    privs.unglitched = true
+    minetest.set_player_privs(target, privs)
     player:set_physics_override({sneak = false})
 end
 
@@ -113,9 +113,9 @@ local function freeze(name, target)
     end
     -- apply curse
     local player = minetest.get_player_by_name(target)
-    local privs=minetest.get_player_privs(target)
-    privs.frozen=true
-    minetest.set_player_privs(target,privs)
+    local privs = minetest.get_player_privs(target)
+    privs.frozen = true
+    minetest.set_player_privs(target, privs)
     player:set_physics_override({jump = 0, speed = 0})
 end
 
@@ -146,7 +146,7 @@ local function getlost(name,target)
     local player = minetest.get_player_by_name(target)
     local privs = minetest.get_player_privs(target)
     privs.lost = true
-    minetest.set_player_privs(target,privs)
+    minetest.set_player_privs(target, privs)
     player:hud_set_flags({minimap = false})
 end
 
@@ -198,13 +198,13 @@ minetest.register_chatcommand("setfree",{
             minetest.chat_send_player(name,"Player does not exist")
             return
         end
-        local privs=minetest.get_player_privs(target)
-        privs.frozen=nil
-        privs.hobbled=nil
-        privs.slowed=nil
-        privs.unglitched=nil
-        privs.lost=nil
-        minetest.set_player_privs(target,privs)
+        local privs = minetest.get_player_privs(target)
+        privs.frozen = nil
+        privs.hobbled = nil
+        privs.slowed = nil
+        privs.unglitched = nil
+        privs.lost = nil
+        minetest.set_player_privs(target, privs)
         player:set_physics_override({jump = 1, speed = 1, sneak = true})
         player:hud_set_flags({minimap = true})
         minetest.chat_send_player(target, "The curse is lifted. You have been set free!")
