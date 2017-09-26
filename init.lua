@@ -183,7 +183,7 @@ minetest.register_on_joinplayer(function(player)
         freeze(name,name)
     end
     if minetest.get_player_privs(name).lost then
-        player:hud_set_flags({minimap = false})
+        getlost(name,name)
     end
 end)
 
