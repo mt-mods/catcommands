@@ -1,5 +1,4 @@
 minetest.register_privilege("secret", "Wouldn't you like to know?")
-minetest.register_privilege("caged", {description = "Not going anywhere...", give_to_singleplayer=false})
 minetest.register_privilege("hidden_one", {description = "Can hide from players.", give_to_singleplayer=false})
 
 
@@ -220,9 +219,8 @@ minetest.register_chatcommand("cage", {
             minetest.chat_send_player(warden_name,"Player does not exist")
             return
         end
-        -- get target player's privs or return
-        local privs = minetest.get_player_privs(target_name)
-        if privs.caged == true then
+        -- return if already caged
+        if target:get_attribute("caged") == "true" then
             minetest.chat_send_player(warden_name,"This player is already caged")
             return
         end
@@ -233,10 +231,12 @@ minetest.register_chatcommand("cage", {
             return
         end
         -- add current target privs to table and save to file
+        local privs = minetest.get_player_privs(target_name)
         priv_table[target_name] = privs
         table_save()
         -- remove all privs but shout and add caged and unglitched
-        minetest.set_player_privs(target_name,{shout = true, caged = true})
+        minetest.set_player_privs(target_name,{shout = true})
+        target:set_attribute("caged", "true")
         noglitch(warden_name, target_name)
         -- move target to cage location
         target:setpos(cagepos)
@@ -255,9 +255,8 @@ minetest.register_chatcommand("uncage", {
             minetest.chat_send_player(warden_name,"Player does not exist")
             return
         end
-        -- get target player's privs or return
-        local privs = minetest.get_player_privs(target_name)
-        if privs.caged ~= true then
+        -- return if not caged
+        if target:get_attribute("caged") ~= "true" then
             minetest.chat_send_player(warden_name,"This player is not caged")
             return
         end
@@ -275,6 +274,8 @@ minetest.register_chatcommand("uncage", {
         table_save()
         -- restore sneak and move target to release point
         target:set_physics_override({sneak = true})
+        target:set_attribute("unglitched", "")
+        target:set_attribute("caged", "")
         target:setpos(releasepos)
     end
 })
