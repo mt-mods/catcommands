@@ -1,28 +1,14 @@
 minetest.register_privilege("secret", "Wouldn't you like to know?")
-minetest.register_privilege("frozen", {description = "Unable to move.", give_to_singleplayer=false})
-minetest.register_privilege("hobbled", {description = "Unable to jump.", give_to_singleplayer=false})
-minetest.register_privilege("slowed", {description = "Slow moving.", give_to_singleplayer=false})
-minetest.register_privilege("unglitched", {description = "Not very glitchy...", give_to_singleplayer=false})
-minetest.register_privilege("lost", {description = "Not allowed to use minimap.", give_to_singleplayer=false})
 minetest.register_privilege("caged", {description = "Not going anywhere...", give_to_singleplayer=false})
 minetest.register_privilege("hidden_one", {description = "Can hide from players.", give_to_singleplayer=false})
-
 
 
 -- Admin Curses
 
 -- prevents player from jumping
 local function hobble(user, target)
-    -- return if player is admin
-    local admin_name  = minetest.setting_get ("name")
-    if target == admin_name then
-        return
-    end
-    -- apply curse
     local player = minetest.get_player_by_name(target)
-    local privs = minetest.get_player_privs(target)
-    privs.hobbled = true
-    minetest.set_player_privs(target,privs)
+    player:set_attribute("hobbled", "true")
     player:set_physics_override({jump = 0})
 end
 
@@ -44,16 +30,8 @@ minetest.register_chatcommand("hobble", {
 
 -- reduces player movement speed
 local function slowmo(name, target)
-    -- return if player is admin
-    local admin_name  = minetest.setting_get ("name")
-    if target == admin_name then
-        return
-    end
-    -- apply curse
     local player = minetest.get_player_by_name(target)
-    local privs = minetest.get_player_privs(target)
-    privs.slowed = true
-    minetest.set_player_privs(target, privs)
+    player:set_attribute("slowed", "true")
     player:set_physics_override({speed = 0.3})
 end
 
@@ -75,16 +53,8 @@ minetest.register_chatcommand("slowmo", {
 
 -- disable sneak glitch for the player
 local function noglitch(name, target)
-    -- return if player is admin
-    local admin_name  = minetest.setting_get ("name")
-    if target == admin_name then
-        return
-    end
-    -- apply curse
     local player = minetest.get_player_by_name(target)
-    local privs = minetest.get_player_privs(target)
-    privs.unglitched = true
-    minetest.set_player_privs(target, privs)
+    player:set_attribute("unglitched", "true")
     player:set_physics_override({sneak = false})
 end
 
@@ -106,16 +76,8 @@ minetest.register_chatcommand("noglitch", {
 
 -- prevent player from changing speed/direction and jumping
 local function freeze(name, target)
-    -- return if player is admin
-    local admin_name  = minetest.setting_get ("name")
-    if target == admin_name then
-        return
-    end
-    -- apply curse
     local player = minetest.get_player_by_name(target)
-    local privs = minetest.get_player_privs(target)
-    privs.frozen = true
-    minetest.set_player_privs(target, privs)
+    player:set_attribute("frozen", "true")
     player:set_physics_override({jump = 0, speed = 0})
 end
 
@@ -137,16 +99,8 @@ minetest.register_chatcommand("freeze", {
 
 -- disables minimap for player
 local function getlost(name,target)
-    -- return if player is admin
-    local admin_name  = minetest.setting_get ("name")
-    if target == admin_name then
-        return
-    end
-    -- apply curse
     local player = minetest.get_player_by_name(target)
-    local privs = minetest.get_player_privs(target)
-    privs.lost = true
-    minetest.set_player_privs(target, privs)
+    player:set_attribute("lost", "true")
     player:hud_set_flags({minimap = false})
 end
 
@@ -170,19 +124,19 @@ minetest.register_chatcommand("getlost", {
 -- trigger curse effects when player joins
 minetest.register_on_joinplayer(function(player)
     local name = player:get_player_name()
-    if minetest.get_player_privs(name).hobbled then
+    if player:get_attribute("hobbled") == "true" then
         hobble(name,name)
     end
-    if minetest.get_player_privs(name).slowed then
+    if player:get_attribute("slowed") == "true" then
         slowmo(name,name)
     end
-    if minetest.get_player_privs(name).unglitched then
+    if player:get_attribute("unglitched") == "true" then
         noglitch(name,name)
     end
-    if minetest.get_player_privs(name).frozen then
+    if player:get_attribute("frozen") == "true" then
         freeze(name,name)
     end
-    if minetest.get_player_privs(name).lost then
+    if player:get_attribute("lost") == "true" then
         getlost(name,name)
     end
 end)
@@ -198,13 +152,11 @@ minetest.register_chatcommand("setfree",{
             minetest.chat_send_player(name,"Player does not exist")
             return
         end
-        local privs = minetest.get_player_privs(target)
-        privs.frozen = nil
-        privs.hobbled = nil
-        privs.slowed = nil
-        privs.unglitched = nil
-        privs.lost = nil
-        minetest.set_player_privs(target, privs)
+        player:set_attribute("hobbled", "")
+        player:set_attribute("slowed", "")
+        player:set_attribute("unglitched", "")
+        player:set_attribute("frozen", "")
+        player:set_attribute("lost", "")
         player:set_physics_override({jump = 1, speed = 1, sneak = true})
         player:hud_set_flags({minimap = true})
         minetest.chat_send_player(target, "The curse is lifted. You have been set free!")
