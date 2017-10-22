@@ -135,7 +135,6 @@ minetest.register_chatcommand("setfree",{
 		end
 		player:set_attribute("hobbled", "")
 		player:set_attribute("slowed", "")
-		player:set_attribute("unglitched", "")
 		player:set_attribute("frozen", "")
 		player:set_attribute("lost", "")
 		player:set_physics_override({jump = 1, speed = 1, sneak = true})
@@ -266,7 +265,7 @@ minetest.register_chatcommand("cage", {
 		local privs = minetest.get_player_privs(target_name)
 		priv_table[target_name] = privs
 		table_save()
-		-- remove all privs but shout and add caged and unglitched
+		-- remove all privs but shout and cage
 		minetest.set_player_privs(target_name,{shout = true})
 		target:set_attribute("caged", "true")
 		sneak_mode(target, "none")
