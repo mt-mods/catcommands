@@ -178,6 +178,29 @@ minetest.register_chatcommand("set_sneak",{
 })
 
 
+-- check player status
+minetest.register_chatcommand("curses",{
+	params = "<person>",
+	privs = {secret = true},
+	description = "Check player status.",
+	func = function(user_name, target_name)
+		local player = minetest.get_player_by_name(target_name)
+		if player == nil then 
+			return false, "Player does not exist."
+		end
+		local result = "Status for player "..target_name..": "
+		local status_list = {"hobbled", "slowed", "frozen", "lost", "caged"}
+		for i, status in ipairs(status_list) do
+			if player:get_attribute(status_list[i]) == "true" then
+				result = result..status_list[i].." "
+			end
+		end
+		minetest.chat_send_player(user_name, result.." Sneak mode: "..player:get_attribute("sneak_mode"))
+		return
+	end
+})
+
+
 -- Cage Commands
 
 local priv_table = {}
