@@ -1,6 +1,7 @@
 minetest.register_privilege("secret", "Wouldn't you like to know?")
 minetest.register_privilege("hidden_one", {description = "Can hide from players.", give_to_singleplayer=false})
 
+local default_sneak_mode = "old" -- change this to "new" if you want new movement.
 
 -- Admin Curses
 
@@ -102,20 +103,24 @@ minetest.register_on_joinplayer(function(player)
 	if player:get_attribute("slowed") == "true" then
 		slowmo(name,name)
 	end
-	if player:get_attribute("unglitched") == "true" then
-		noglitch(name,name)
-	end
 	if player:get_attribute("frozen") == "true" then
 		freeze(name,name)
 	end
 	if player:get_attribute("lost") == "true" then
 		getlost(name,name)
 	end
+	-- set sneak mode if unassigned
+	if player:get_attribute("sneak_mode") == nil then
+		player:set_attribute("sneak_mode", default_sneak_mode)
+	end
+	-- set movement physics based on sneak_mode
 	if player:get_attribute("sneak_mode") == "old" then
-		player:set_physics_override({new_move = false, sneak_glitch = true})
+		player:set_physics_override({new_move = false, sneak_glitch = true, sneak = true})
 	elseif player:get_attribute("sneak_mode") == "new" then
-		player:set_physics_override({new_move = true, sneak_glitch = false})
-	end	
+		player:set_physics_override({new_move = true, sneak_glitch = false, sneak = true})
+	elseif player:get_attribute("sneak_mode") == "none" then
+		player:set_physics_override({sneak = false})
+	end
 end)
 
 -- reset player physics
@@ -274,8 +279,7 @@ minetest.register_chatcommand("uncage", {
 		priv_table[target_name] = nil
 		table_save()
 		-- restore sneak and move target to release point
-		local mode = "old" -- TODO: need to check conf here
-		sneak_mode(target, mode)
+		sneak_mode(target, default_sneak_mode)
 		target:set_attribute("caged", "")
 		target:setpos(releasepos)
 	end
