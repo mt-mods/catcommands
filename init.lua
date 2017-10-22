@@ -50,29 +50,6 @@ minetest.register_chatcommand("slowmo", {
 	end
 })
 
--- disable sneak glitch for the player
-local function noglitch(name, target)
-	local player = minetest.get_player_by_name(target)
-	player:set_attribute("unglitched", "true")
-	player:set_physics_override({sneak = false})
-end
-
-minetest.register_chatcommand("noglitch", {
-	params = "<person>",
-	privs = {secret=true},
-	description = "Disable sneak glitch for a player.",
-	func = function(name, target)
-		local player = minetest.get_player_by_name(target)
-		if player == nil then
-			minetest.chat_send_player(name,"Player does not exist")
-			return
-		end
-		noglitch(name, target)
-		minetest.chat_send_player(target, "Cursed by an admin! You feel less glitchy...")
-		minetest.chat_send_player(name, "Curse successful!")
-	end
-})
-
 -- prevent player from changing speed/direction and jumping
 local function freeze(name, target)
 	local player = minetest.get_player_by_name(target)
@@ -138,6 +115,11 @@ minetest.register_on_joinplayer(function(player)
 	if player:get_attribute("lost") == "true" then
 		getlost(name,name)
 	end
+	if player:get_attribute("sneak_mode") == "old" then
+		player:set_physics_override({new_move = false, sneak_glitch = true})
+	elseif player:get_attribute("sneak_mode") == "new" then
+		player:set_physics_override({new_move = true, sneak_glitch = false})
+	end	
 end)
 
 -- reset player physics
@@ -160,9 +142,40 @@ minetest.register_chatcommand("setfree",{
 		player:hud_set_flags({minimap = true})
 		minetest.chat_send_player(target, "The curse is lifted. You have been set free!")
 		minetest.chat_send_player(name, "The curse is lifted.")
-	end,
+	end
 })
 
+-- set sneak mode
+local function sneak_mode(player, mode)
+	player:set_attribute("sneak_mode", mode)
+	if mode == "old" then
+		player:set_physics_override({new_move = false, sneak_glitch = true, sneak = true})
+	elseif mode == "new" then
+		player:set_physics_override({new_move = true, sneak_glitch = false, sneak = true})
+	elseif mode == "none" then
+		player:set_physics_override({sneak = false})
+	end
+end
+
+minetest.register_chatcommand("set_sneak",{
+	params = "<player> <old | new | none>",
+	privs = {secret = true},
+	description = "Set sneak mode for player.",
+	func = function(name, params)
+		local target, mode = params:match("(%S+)%s+(.+)")
+		if not target and not reason then
+			return false, "Must include player name and sneak mode."
+		end
+		local player = minetest.get_player_by_name(target)
+		if not player then 
+			return false, "Player does not exist"
+		end
+		if not mode or (mode ~= "old" and mode ~= "new" and mode ~= "none") then
+			return false, "Set a mode: old, new or none."
+		end
+		sneak_mode(player, mode)
+	end
+})
 
 
 -- Cage Commands
@@ -208,7 +221,7 @@ minetest.register_chatcommand("cage", {
 	privs = {secret=true},
 	description = "Put a player in the cage.",
 	func = function(warden_name, target_name)
-		--prevent self-caging
+		-- prevent self-caging
 		if warden_name == target_name then
 			minetest.chat_send_player(warden_name,"You can't cage yourself")
 			return
@@ -237,7 +250,7 @@ minetest.register_chatcommand("cage", {
 		-- remove all privs but shout and add caged and unglitched
 		minetest.set_player_privs(target_name,{shout = true})
 		target:set_attribute("caged", "true")
-		noglitch(warden_name, target_name)
+		sneak_mode(target, "none")
 		-- move target to cage location
 		target:setpos(cagepos)
 	end
@@ -273,8 +286,8 @@ minetest.register_chatcommand("uncage", {
 		priv_table[target_name] = nil
 		table_save()
 		-- restore sneak and move target to release point
-		target:set_physics_override({sneak = true})
-		target:set_attribute("unglitched", "")
+		local mode = "old" -- TODO: need to check conf here
+		sneak_mode(target, mode)
 		target:set_attribute("caged", "")
 		target:setpos(releasepos)
 	end
