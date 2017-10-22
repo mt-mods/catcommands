@@ -18,8 +18,7 @@ minetest.register_chatcommand("hobble", {
 	func = function(name, target)
 		local player = minetest.get_player_by_name(target)
 		if player == nil then
-			minetest.chat_send_player(name,"Player does not exist")
-			return
+			return false, "Player does not exist."
 		end
 		hobble(name, target)
 		minetest.chat_send_player(target, "Cursed by an admin! No more jumping!")
@@ -41,8 +40,7 @@ minetest.register_chatcommand("slowmo", {
 	func = function(name, target)
 		local player = minetest.get_player_by_name(target)
 		if player == nil then
-			minetest.chat_send_player(name,"Player does not exist") 
-			return
+			return false, "Player does not exist."
 		end
 		slowmo(name,target)
 		minetest.chat_send_player(target, "Cursed by an admin! You feel sloooooow!")
@@ -64,8 +62,7 @@ minetest.register_chatcommand("freeze", {
 	func = function(name, target)
 		local player = minetest.get_player_by_name(target)
 		if player == nil then
-			minetest.chat_send_player(name,"Player does not exist")
-			return
+			return false, "Player does not exist."
 		end
 		freeze(name, target)
 		minetest.chat_send_player(target, "Cursed by an admin! You are now frozen!")
@@ -87,8 +84,7 @@ minetest.register_chatcommand("getlost", {
 	func = function(name, target)
 		local player = minetest.get_player_by_name(target)
 		if player == nil then
-			minetest.chat_send_player(name,"Player does not exist")
-			return
+			return false, "Player does not exist."
 		end
 		getlost(name,target)
 		minetest.chat_send_player(target, "Cursed by an admin! You will get lost now!")
@@ -130,8 +126,7 @@ minetest.register_chatcommand("setfree",{
 	func = function(name, target)
 		local player = minetest.get_player_by_name(target)
 		if player == nil then 
-			minetest.chat_send_player(name,"Player does not exist")
-			return
+			return false, "Player does not exist."
 		end
 		player:set_attribute("hobbled", "")
 		player:set_attribute("slowed", "")
@@ -168,7 +163,7 @@ minetest.register_chatcommand("set_sneak",{
 		end
 		local player = minetest.get_player_by_name(target)
 		if not player then 
-			return false, "Player does not exist"
+			return false, "Player does not exist."
 		end
 		if not mode or (mode ~= "old" and mode ~= "new" and mode ~= "none") then
 			return false, "Set a mode: old, new or none."
@@ -223,25 +218,21 @@ minetest.register_chatcommand("cage", {
 	func = function(warden_name, target_name)
 		-- prevent self-caging
 		if warden_name == target_name then
-			minetest.chat_send_player(warden_name,"You can't cage yourself")
-			return
+			return false, "You can't cage yourself."
 		end
 		-- get target player or return
 		local target = minetest.get_player_by_name(target_name)
 		if not target then
-			minetest.chat_send_player(warden_name,"Player does not exist")
-			return
+			return false, "Player does not exist."
 		end
 		-- return if already caged
 		if target:get_attribute("caged") == "true" then
-			minetest.chat_send_player(warden_name,"This player is already caged")
-			return
+			return false, "This player is already caged."
 		end
 		-- get cage position from config or return
 		local cagepos = minetest.setting_get_pos("cage_coordinate")
 		if not cagepos then
-			minetest.chat_send_player(warden_name, "No cage set...")
-			return
+			return false, "No cage set..."
 		end
 		-- add current target privs to table and save to file
 		local privs = minetest.get_player_privs(target_name)
@@ -265,19 +256,16 @@ minetest.register_chatcommand("uncage", {
 		-- get target player or return
 		local target = minetest.get_player_by_name(target_name)
 		if not target then
-			minetest.chat_send_player(warden_name,"Player does not exist")
-			return
+			return false, "Player does not exist."
 		end
 		-- return if not caged
 		if target:get_attribute("caged") ~= "true" then
-			minetest.chat_send_player(warden_name,"This player is not caged")
-			return
+			return false, "This player is not caged."
 		end
 		-- get release position from config or return
 		local releasepos = minetest.setting_get_pos("release_coordinate")
 		if not releasepos then
-			minetest.chat_send_player(warden_name, "No release point set...")
-			return
+			return false, "No release point set..."
 		end
 		-- get target's original privs from table and restore them
 		local original_privs = priv_table[target_name]
