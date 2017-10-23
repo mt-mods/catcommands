@@ -202,41 +202,6 @@ minetest.register_chatcommand("curses",{
 
 -- Cage Commands
 
-local priv_table = {}
-
--- save table to file
-local function table_save()
-	local data = priv_table
-	local f, err = io.open(minetest.get_worldpath() .. "/curse_priv_table.txt", "w")
-	if err then
-		return err
-	end
-	f:write(minetest.serialize(data))
-	f:close()
-end
-
--- read saved file
-local function table_read()
-	local f, err = io.open(minetest.get_worldpath() .. "/curse_priv_table.txt", "r")
-	local data = minetest.deserialize(f:read("*a"))
-	f:close()
-	return data
-end
-
-minetest.after(3.0, function()
-	local f, err = io.open(minetest.get_worldpath() .. "/curse_priv_table.txt", "r")
-	if err then
-		table_save()
-	else
-		priv_table = table_read()
-	end
-end)
-
-minetest.register_on_shutdown(function()
-	table_save()
-end)
-
-
 -- put a player in the cage
 minetest.register_chatcommand("cage", {
 	params = "<person>",
@@ -261,15 +226,13 @@ minetest.register_chatcommand("cage", {
 		if not cagepos then
 			return false, "No cage set..."
 		end
-		-- add current target privs to table and save to file
-		local privs = minetest.get_player_privs(target_name)
-		priv_table[target_name] = privs
-		table_save()
-		-- remove all privs but shout and cage
+		-- save then remove all privs other than shout
+		local target_privs = minetest.privs_to_string(minetest.get_player_privs(target_name))
+		target:set_attribute("caged_privs", target_privs)
+		minetest.chat_send_player(warden_name, target:get_attribute("caged_privs"))
 		minetest.set_player_privs(target_name,{shout = true})
 		target:set_attribute("caged", "true")
 		sneak_mode(target, "none")
-		-- move target to cage location
 		target:setpos(cagepos)
 	end
 })
@@ -294,30 +257,13 @@ minetest.register_chatcommand("uncage", {
 		if not releasepos then
 			return false, "No release point set..."
 		end
-		-- get target's original privs from table and restore them
-		local original_privs = priv_table[target_name]
-		minetest.set_player_privs(target_name,original_privs)
-		-- remove entry for target from table and save to file
-		priv_table[target_name] = nil
-		table_save()
-		-- restore sneak and move target to release point
+		-- restore privs and release
+		local original_privs = minetest.string_to_privs(target:get_attribute("caged_privs"))
+		minetest.set_player_privs(target_name, original_privs)
+		target:set_attribute("caged_privs", nil)
 		sneak_mode(target, default_sneak_mode)
 		target:set_attribute("caged", "")
 		target:setpos(releasepos)
-	end
-})
-
--- list caged players
-minetest.register_chatcommand("list_caged", {
-	params = "",
-	description = "List all caged players.",
-	privs = {server = true},
-	func = function (_, _)
-		local players = ""
-		for player, _ in pairs(priv_table) do
-			players = players .. player .. ", "
-		end
-		return true, "Currently caged players: " .. players
 	end
 })
 
