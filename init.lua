@@ -93,6 +93,28 @@ minetest.register_chatcommand("getlost", {
 	end
 })
 
+-- lower light levels for player
+local function blind(name,target)
+	local player = minetest.get_player_by_name(target)
+	player:set_attribute("blind", "true")
+	player:override_day_night_ratio(0.05)
+end
+
+minetest.register_chatcommand("blind", {
+	params = "<person>",
+	privs = {secret=true},
+	description = "Place player in eternal night time.",
+	func = function(name, target)
+		local player = minetest.get_player_by_name(target)
+		if player == nil then
+			return false, "Player does not exist."
+		end
+		blind(name,target)
+		minetest.chat_send_player(target, "Cursed by an admin! Eternal night time!")
+		minetest.chat_send_player(name, "Curse successful!")
+	end
+})
+
 
 -- trigger curse effects when player joins
 minetest.register_on_joinplayer(function(player)
@@ -109,6 +131,9 @@ minetest.register_on_joinplayer(function(player)
 	if player:get_attribute("lost") == "true" then
 		getlost(name,name)
 	end
+	if player:get_attribute("blind") == "true" then
+		blind(name,name)
+	end	
 	-- set sneak mode if unassigned
 	if player:get_attribute("sneak_mode") == nil then
 		player:set_attribute("sneak_mode", default_sneak_mode)
@@ -137,8 +162,10 @@ minetest.register_chatcommand("setfree",{
 		player:set_attribute("slowed", "")
 		player:set_attribute("frozen", "")
 		player:set_attribute("lost", "")
+		player:set_attribute("blind", "")
 		player:set_physics_override({jump = 1, speed = 1, sneak = true})
 		player:hud_set_flags({minimap = true})
+		player:override_day_night_ratio(nil)
 		minetest.chat_send_player(target, "The curse is lifted. You have been set free!")
 		minetest.chat_send_player(name, "The curse is lifted.")
 	end
@@ -188,7 +215,7 @@ minetest.register_chatcommand("curses",{
 			return false, "Player does not exist."
 		end
 		local result = "Status for player "..target_name..": "
-		local status_list = {"hobbled", "slowed", "frozen", "lost", "caged"}
+		local status_list = {"hobbled", "slowed", "frozen", "lost", "blind", "caged"}
 		for i, status in ipairs(status_list) do
 			if player:get_attribute(status_list[i]) == "true" then
 				result = result..status_list[i].." "
