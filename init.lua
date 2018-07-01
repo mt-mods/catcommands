@@ -28,24 +28,38 @@ minetest.register_chatcommand("hobble", {
 })
 
 -- reduces player movement speed
-local function slowmo(name, target)
+local default_slow = 0.3
+
+local function slowmo(name, target, speed)
 	local player = minetest.get_player_by_name(target)
-	player:set_attribute("slowed", "true")
-	player:set_physics_override({speed = 0.3})
+	player:set_attribute("slowed", speed)
+	player:set_physics_override({speed = speed})
 end
 
 minetest.register_chatcommand("slowmo", {
-	params = "<person>",
-	privs = {secret=true},
+	params = "<person> <speed>",
+	privs = {secret = true},
 	description = "Reduce player movement speed.",
-	func = function(name, target)
+
+	func = function(name, params)
+		local target, speed = params:match("^(%S+)%s*([%d.]*)$")
+		if target == nil or target == "" then
+			return false, "You must enter a player name, optionally followed by speed."
+		end
+
 		local player = minetest.get_player_by_name(target)
 		if player == nil then
 			return false, "Player does not exist."
 		end
-		slowmo(name,target)
+
+		if speed == nil or speed == "" or
+				tonumber(speed) > 1.0 or tonumber(speed) < 0.1 then
+			speed = default_slow
+		end
+
+		slowmo(name, target, speed)
 		minetest.chat_send_player(target, "Cursed by an admin! You feel sloooooow!")
-		minetest.chat_send_player(name, "Curse successful!")
+		minetest.chat_send_player(name, "Curse successful! "..target.."'s speed set to "..speed)
 	end
 })
 
@@ -122,8 +136,9 @@ minetest.register_on_joinplayer(function(player)
 	if player:get_attribute("hobbled") == "true" then
 		hobble(name,name)
 	end
-	if player:get_attribute("slowed") == "true" then
-		slowmo(name,name)
+	local slowed = player:get_attribute("slowed")
+	if slowed then
+		slowmo(name,name, tonumber(slowed))
 	end
 	if player:get_attribute("frozen") == "true" then
 		freeze(name,name)
@@ -220,6 +235,9 @@ minetest.register_chatcommand("curses",{
 			if player:get_attribute(status_list[i]) == "true" then
 				result = result..status_list[i].." "
 			end
+		end
+		if player:get_attribute("slowed") ~= "" then
+			result = result.."slowed("..player:get_attribute("slowed")..")"
 		end
 		minetest.chat_send_player(user_name, result.." Sneak mode: "..player:get_attribute("sneak_mode"))
 		return
