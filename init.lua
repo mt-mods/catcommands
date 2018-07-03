@@ -58,7 +58,8 @@ minetest.register_chatcommand("slowmo", {
 		end
 
 		slowmo(name, target, speed)
-		minetest.chat_send_player(target, "Cursed by an admin! You feel sloooooow!")
+		minetest.chat_send_player(target, "Cursed by an admin! You feel sloooooow! " ..
+			"(Speed set to ".. speed ..")")
 		minetest.chat_send_player(name, "Curse successful! "..target.."'s speed set to "..speed)
 	end
 })
