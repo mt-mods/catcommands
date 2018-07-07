@@ -228,7 +228,7 @@ minetest.register_chatcommand("curses",{
 	func = function(user_name, target_name)
 		local player = minetest.get_player_by_name(target_name)
 		if player == nil then 
-			return false, "Player does not exist."
+			return false, "Player does not exist or is not logged in."
 		end
 		local result = "Status for player "..target_name..": "
 		local status_list = {"hobbled", "slowed", "frozen", "lost", "blind", "caged"}
@@ -237,7 +237,7 @@ minetest.register_chatcommand("curses",{
 				result = result..status_list[i].." "
 			end
 		end
-		if player:get_attribute("slowed") ~= "" then
+		if player:get_attribute("slowed") and player:get_attribute("slowed") ~= "" then
 			result = result.."slowed("..player:get_attribute("slowed")..")"
 		end
 		minetest.chat_send_player(user_name, result.." Sneak mode: "..player:get_attribute("sneak_mode"))
