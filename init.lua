@@ -149,7 +149,7 @@ minetest.register_on_joinplayer(function(player)
 	end
 	if player:get_attribute("blind") == "true" then
 		blind(name,name)
-	end	
+	end
 	-- set sneak mode if unassigned
 	if player:get_attribute("sneak_mode") == nil then
 		player:set_attribute("sneak_mode", default_sneak_mode)
@@ -171,7 +171,7 @@ minetest.register_chatcommand("setfree",{
 	description = "Reset player movement.",
 	func = function(name, target)
 		local player = minetest.get_player_by_name(target)
-		if player == nil then 
+		if player == nil then
 			return false, "Player does not exist."
 		end
 		player:set_attribute("hobbled", "")
@@ -205,11 +205,11 @@ minetest.register_chatcommand("set_sneak",{
 	description = "Set sneak mode for player.",
 	func = function(name, params)
 		local target, mode = params:match("(%S+)%s+(.+)")
-		if not target and not reason then
+		if not target then --and not reason then
 			return false, "Must include player name and sneak mode."
 		end
 		local player = minetest.get_player_by_name(target)
-		if not player then 
+		if not player then
 			return false, "Player does not exist."
 		end
 		if not mode or (mode ~= "old" and mode ~= "new" and mode ~= "none") then
@@ -227,7 +227,7 @@ minetest.register_chatcommand("curses",{
 	description = "Check player status.",
 	func = function(user_name, target_name)
 		local player = minetest.get_player_by_name(target_name)
-		if player == nil then 
+		if player == nil then
 			return false, "Player does not exist or is not logged in."
 		end
 		local result = "Status for player "..target_name..": "
@@ -353,7 +353,7 @@ minetest.register_chatcommand("proclaim", {
 			return
 		end
 		minetest.chat_send_all(text)
-		if minetest.get_modpath("irc") then 
+		if minetest.get_modpath("irc") then
 			if irc.connected and irc.config.send_join_part then
 				irc:say(text)
 			end
