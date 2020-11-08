@@ -330,7 +330,7 @@ minetest.register_chatcommand("vanish", {
 		vanished_players[user] = not vanished_players[user]
 		if vanished_players[user] then
 			prop = {visual_size = {x = 0, y = 0},
-			collisionbox = {0,0,0,0,0,0}}
+			collisionbox = {-0.01, -0.01, -0.01, 0.01, 0.01, 0.01}}
 			player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
 		else
 			-- default player size.
