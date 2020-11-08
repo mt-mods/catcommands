@@ -321,10 +321,22 @@ minetest.register_chatcommand("uncage", {
 vanished_players = {}
 
 minetest.register_chatcommand("vanish", {
-	params = "",
-	description = "Make user invisible",
+	params = "<optional player>",
+	description = "Make yourself or suppilied user invisible",
 	privs = {hidden_one = true},
-	func = function(user)
+	func = function(caller, param)
+        local user
+        if not param or param == "" then
+			user = caller
+        else
+            if not minetest.get_player_by_name(param) then
+                minetest.chat_send_player(caller, param .. " is not a valid player")
+                return
+            else
+                user = param
+            end
+		end
+
 		local prop
 		local player = minetest.get_player_by_name(user)
 		vanished_players[user] = not vanished_players[user]
