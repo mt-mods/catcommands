@@ -342,13 +342,13 @@ minetest.register_chatcommand("vanish", {
 		vanished_players[user] = not vanished_players[user]
 		if vanished_players[user] then
 			prop = {visual_size = {x = 0, y = 0},
-			collisionbox = {-0.01, -0.01, -0.01, 0.01, 0.01, 0.01}}
+			selectionbox = {-0.01, -0.01, -0.01, 0.01, 0.01, 0.01}}
 			player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
             minetest.chat_send_player(user, "you are now vanished")
 		else
 			-- default player size.
 			prop = {visual_size = {x = 1, y = 1},
-			collisionbox = {-0.35, 0, -0.35, 0.35, 2, 0.35}}
+			selectionbox = {-0.35, 0, -0.35, 0.35, 2, 0.35}}
 			player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
             minetest.chat_send_player(user, "you are now un vanished")
 		end
