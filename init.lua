@@ -8,7 +8,7 @@ local default_sneak_mode = "old" -- change this to "new" if you want new movemen
 -- prevents player from jumping
 local function hobble(user, target)
 	local player = minetest.get_player_by_name(target)
-	player:set_attribute("hobbled", "true")
+	player:get_meta():set_string("hobbled", "true")
 	player:set_physics_override({jump = 0})
 end
 
@@ -32,7 +32,7 @@ local default_slow = 0.3
 
 local function slowmo(name, target, speed)
 	local player = minetest.get_player_by_name(target)
-	player:set_attribute("slowed", speed)
+	player:get_meta():set_string("slowed", speed)
 	player:set_physics_override({speed = speed})
 end
 
@@ -67,7 +67,7 @@ minetest.register_chatcommand("slowmo", {
 -- prevent player from changing speed/direction and jumping
 local function freeze(name, target)
 	local player = minetest.get_player_by_name(target)
-	player:set_attribute("frozen", "true")
+	player:get_meta():set_string("frozen", "true")
 	player:set_physics_override({jump = 0, speed = 0})
 end
 
@@ -89,7 +89,7 @@ minetest.register_chatcommand("freeze", {
 -- disables minimap for player
 local function getlost(name,target)
 	local player = minetest.get_player_by_name(target)
-	player:set_attribute("lost", "true")
+	player:get_meta():set_string("lost", "true")
 	player:hud_set_flags({minimap = false})
 end
 
@@ -111,7 +111,7 @@ minetest.register_chatcommand("getlost", {
 -- lower light levels for player
 local function blind(name,target)
 	local player = minetest.get_player_by_name(target)
-	player:set_attribute("blind", "true")
+	player:get_meta():set_string("blind", "true")
 	player:override_day_night_ratio(0.05)
 end
 
@@ -134,32 +134,32 @@ minetest.register_chatcommand("blind", {
 -- trigger curse effects when player joins
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
-	if player:get_attribute("hobbled") == "true" then
+	if player:get_meta():get_string("hobbled") == "true" then
 		hobble(name,name)
 	end
-	local slowed = player:get_attribute("slowed")
+	local slowed = player:get_meta():get_string("slowed")
 	if slowed then
 		slowmo(name,name, tonumber(slowed))
 	end
-	if player:get_attribute("frozen") == "true" then
+	if player:get_meta():get_string("frozen") == "true" then
 		freeze(name,name)
 	end
-	if player:get_attribute("lost") == "true" then
+	if player:get_meta():get_string("lost") == "true" then
 		getlost(name,name)
 	end
-	if player:get_attribute("blind") == "true" then
+	if player:get_meta():get_string("blind") == "true" then
 		blind(name,name)
 	end
 	-- set sneak mode if unassigned
-	if player:get_attribute("sneak_mode") == nil then
-		player:set_attribute("sneak_mode", default_sneak_mode)
+	if player:get_meta():get_string("sneak_mode") == nil then
+		player:get_meta():set_string("sneak_mode", default_sneak_mode)
 	end
 	-- set movement physics based on sneak_mode
-	if player:get_attribute("sneak_mode") == "old" then
+	if player:get_meta():get_string("sneak_mode") == "old" then
 		player:set_physics_override({new_move = false, sneak_glitch = true, sneak = true})
-	elseif player:get_attribute("sneak_mode") == "new" then
+	elseif player:get_meta():get_string("sneak_mode") == "new" then
 		player:set_physics_override({new_move = true, sneak_glitch = false, sneak = true})
-	elseif player:get_attribute("sneak_mode") == "none" then
+	elseif player:get_meta():get_string("sneak_mode") == "none" then
 		player:set_physics_override({sneak = false})
 	end
 end)
@@ -174,11 +174,11 @@ minetest.register_chatcommand("setfree",{
 		if player == nil then
 			return false, "Player does not exist."
 		end
-		player:set_attribute("hobbled", "")
-		player:set_attribute("slowed", "")
-		player:set_attribute("frozen", "")
-		player:set_attribute("lost", "")
-		player:set_attribute("blind", "")
+		player:get_meta():set_string("hobbled", "")
+		player:get_meta():set_string("slowed", "")
+		player:get_meta():set_string("frozen", "")
+		player:get_meta():set_string("lost", "")
+		player:get_meta():set_string("blind", "")
 		player:set_physics_override({jump = 1, speed = 1, sneak = true})
 		player:hud_set_flags({minimap = true})
 		player:override_day_night_ratio(nil)
@@ -189,7 +189,7 @@ minetest.register_chatcommand("setfree",{
 
 -- set sneak mode
 local function sneak_mode(player, mode)
-	player:set_attribute("sneak_mode", mode)
+	player:get_meta():set_string("sneak_mode", mode)
 	if mode == "old" then
 		player:set_physics_override({new_move = false, sneak_glitch = true, sneak = true})
 	elseif mode == "new" then
@@ -233,14 +233,14 @@ minetest.register_chatcommand("curses",{
 		local result = "Status for player "..target_name..": "
 		local status_list = {"hobbled", "slowed", "frozen", "lost", "blind", "caged"}
 		for i, status in ipairs(status_list) do
-			if player:get_attribute(status_list[i]) == "true" then
+			if player:get_meta():get_string(status_list[i]) == "true" then
 				result = result..status_list[i].." "
 			end
 		end
-		if player:get_attribute("slowed") and player:get_attribute("slowed") ~= "" then
-			result = result.."slowed("..player:get_attribute("slowed")..")"
+		if player:get_meta():get("slowed") and player:get_meta():get_string("slowed") ~= "" then
+			result = result.."slowed("..player:get_meta():get_string("slowed")..")"
 		end
-		minetest.chat_send_player(user_name, result.." Sneak mode: "..player:get_attribute("sneak_mode"))
+		minetest.chat_send_player(user_name, result.." Sneak mode: "..player:get_meta():get_string("sneak_mode"))
 		return
 	end
 })
@@ -264,7 +264,7 @@ minetest.register_chatcommand("cage", {
 			return false, "Player does not exist."
 		end
 		-- return if already caged
-		if target:get_attribute("caged") == "true" then
+		if target:get_meta():get_string("caged") == "true" then
 			return false, "This player is already caged."
 		end
 		-- get cage position from config or return
@@ -274,10 +274,10 @@ minetest.register_chatcommand("cage", {
 		end
 		-- save then remove all privs other than shout
 		local target_privs = minetest.privs_to_string(minetest.get_player_privs(target_name))
-		target:set_attribute("caged_privs", target_privs)
-		minetest.chat_send_player(warden_name, target:get_attribute("caged_privs"))
+		target:get_meta():set_string("caged_privs", target_privs)
+		minetest.chat_send_player(warden_name, target:get_meta():get_string("caged_privs"))
 		minetest.set_player_privs(target_name,{shout = true})
-		target:set_attribute("caged", "true")
+		target:get_meta():set_string("caged", "true")
 		sneak_mode(target, "none")
 		target:setpos(cagepos)
 	end
@@ -295,7 +295,7 @@ minetest.register_chatcommand("uncage", {
 			return false, "Player does not exist."
 		end
 		-- return if not caged
-		if target:get_attribute("caged") ~= "true" then
+		if target:get_meta():get_string("caged") ~= "true" then
 			return false, "This player is not caged."
 		end
 		-- get release position from config or return
@@ -304,11 +304,11 @@ minetest.register_chatcommand("uncage", {
 			return false, "No release point set..."
 		end
 		-- restore privs and release
-		local original_privs = minetest.string_to_privs(target:get_attribute("caged_privs"))
+		local original_privs = minetest.string_to_privs(target:get_meta():get_string("caged_privs"))
 		minetest.set_player_privs(target_name, original_privs)
-		target:set_attribute("caged_privs", nil)
+		target:get_meta():set_string("caged_privs", nil)
 		sneak_mode(target, default_sneak_mode)
-		target:set_attribute("caged", "")
+		target:get_meta():set_string("caged", "")
 		target:setpos(releasepos)
 	end
 })
