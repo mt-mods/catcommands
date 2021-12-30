@@ -4,6 +4,9 @@ exclude_files = {".luacheckrc"}
 
 globals = {
     "minetest",
+
+    --mod created
+    "catcommands",
 }
 
 read_globals = {
