@@ -6,7 +6,7 @@ globals = {
     "minetest",
 
     --mod created
-    "catcommands",
+    "catcommands", "map",
 }
 
 read_globals = {
