@@ -1,7 +1,7 @@
 local default_sneak_mode = "old" -- change this to "new" if you want new movement.
 
 -- trigger curse effects when player joins
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 
 	-- set sneak mode if unassigned
 	if player:get_meta():get_string("sneak_mode") == nil then
@@ -18,19 +18,19 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 -- reset player physics
-minetest.register_chatcommand("setfree",{
+core.register_chatcommand("setfree",{
 	params = "<person>",
 	privs = {secret=true},
 	description = "Reset player movement.",
 	func = function(name, param)
-		local player = minetest.get_player_by_name(param)
+		local player = core.get_player_by_name(param)
 		if not player then return false, "Player does not exist." end
 
 		for key, effect in pairs(catcommands.effects) do
 			catcommands.effects[key]("", player, false, false, {})
 		end
 
-		minetest.chat_send_player(param, "The curse is lifted. You have been set free!")
+		core.chat_send_player(param, "The curse is lifted. You have been set free!")
 		return true, "The curses on " .. param .. " are lifted."
 	end
 })
@@ -47,7 +47,7 @@ local function sneak_mode(player, mode)
 	end
 end
 
-minetest.register_chatcommand("set_sneak",{
+core.register_chatcommand("set_sneak",{
 	params = "<player> <old | new | none>",
 	privs = {secret = true},
 	description = "Set sneak mode for player.",
@@ -56,7 +56,7 @@ minetest.register_chatcommand("set_sneak",{
 		if not target then --and not reason then
 			return false, "Must include player name and sneak mode."
 		end
-		local player = minetest.get_player_by_name(target)
+		local player = core.get_player_by_name(target)
 		if not player then
 			return false, "Player does not exist."
 		end
@@ -70,7 +70,7 @@ minetest.register_chatcommand("set_sneak",{
 -- Cage Commands
 
 -- put a player in the cage
-minetest.register_chatcommand("cage", {
+core.register_chatcommand("cage", {
 	params = "<person>",
 	privs = {secret=true},
 	description = "Put a player in the cage.",
@@ -80,7 +80,7 @@ minetest.register_chatcommand("cage", {
 			return false, "You can't cage yourself."
 		end
 		-- get target player or return
-		local target = minetest.get_player_by_name(target_name)
+		local target = core.get_player_by_name(target_name)
 		if not target then
 			return false, "Player does not exist."
 		end
@@ -89,15 +89,15 @@ minetest.register_chatcommand("cage", {
 			return false, "This player is already caged."
 		end
 		-- get cage position from config or return
-		local cagepos = minetest.setting_get_pos("cage_coordinate")
+		local cagepos = core.setting_get_pos("cage_coordinate")
 		if not cagepos then
 			return false, "No cage set..."
 		end
 		-- save then remove all privs other than shout
-		local target_privs = minetest.privs_to_string(minetest.get_player_privs(target_name))
+		local target_privs = core.privs_to_string(core.get_player_privs(target_name))
 		target:get_meta():set_string("caged_privs", target_privs)
-		minetest.chat_send_player(warden_name, target:get_meta():get_string("caged_privs"))
-		minetest.set_player_privs(target_name,{shout = true})
+		core.chat_send_player(warden_name, target:get_meta():get_string("caged_privs"))
+		core.set_player_privs(target_name,{shout = true})
 		target:get_meta():set_string("caged", "true")
 		sneak_mode(target, "none")
 		target:setpos(cagepos)
@@ -105,13 +105,13 @@ minetest.register_chatcommand("cage", {
 })
 
 -- free a player from the cage
-minetest.register_chatcommand("uncage", {
+core.register_chatcommand("uncage", {
 	params = "<person>",
 	privs = {secret=true},
 	description = "Free a player from the cage.",
 	func = function(warden_name, target_name)
 		-- get target player or return
-		local target = minetest.get_player_by_name(target_name)
+		local target = core.get_player_by_name(target_name)
 		if not target then
 			return false, "Player does not exist."
 		end
@@ -120,13 +120,13 @@ minetest.register_chatcommand("uncage", {
 			return false, "This player is not caged."
 		end
 		-- get release position from config or return
-		local releasepos = minetest.setting_get_pos("release_coordinate")
+		local releasepos = core.setting_get_pos("release_coordinate")
 		if not releasepos then
 			return false, "No release point set..."
 		end
 		-- restore privs and release
-		local original_privs = minetest.string_to_privs(target:get_meta():get_string("caged_privs"))
-		minetest.set_player_privs(target_name, original_privs)
+		local original_privs = core.string_to_privs(target:get_meta():get_string("caged_privs"))
+		core.set_player_privs(target_name, original_privs)
 		target:get_meta():set_string("caged_privs", nil)
 		sneak_mode(target, default_sneak_mode)
 		target:get_meta():set_string("caged", "")
@@ -140,25 +140,25 @@ minetest.register_chatcommand("uncage", {
 
 vanished_players = {}
 
-minetest.register_chatcommand("vanish", {
+core.register_chatcommand("vanish", {
 	params = "<optional player>",
 	description = "Make yourself or suppilied user invisible",
 	privs = {hidden_one = true},
 	func = function(caller, param)
-        local user
-        if not param or param == "" then
+		local user
+		if not param or param == "" then
 			user = caller
-        else
-            if not minetest.get_player_by_name(param) then
-                minetest.chat_send_player(caller, param .. " is not a valid player")
-                return
-            else
-                user = param
-            end
+		else
+			if not core.get_player_by_name(param) then
+				core.chat_send_player(caller, param .. " is not a valid player")
+				return
+			else
+				user = param
+			end
 		end
 
 		local prop
-		local player = minetest.get_player_by_name(user)
+		local player = core.get_player_by_name(user)
 		vanished_players[user] = not vanished_players[user]
 		if vanished_players[user] then
 			prop = {
@@ -168,7 +168,7 @@ minetest.register_chatcommand("vanish", {
 				makes_footstep_sound = false,
 			}
 			player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-            minetest.chat_send_player(user, "you are now vanished")
+			core.chat_send_player(user, "you are now vanished")
 		else
 			-- default player size.
 			prop = {
@@ -178,7 +178,7 @@ minetest.register_chatcommand("vanish", {
 				makes_footstep_sound = true,
 			}
 			player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
-            minetest.chat_send_player(user, "you are now un vanished")
+			core.chat_send_player(user, "you are now un vanished")
 		end
 		player:set_properties(prop)
 	end

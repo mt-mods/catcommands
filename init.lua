@@ -1,8 +1,8 @@
 catcommands = {}
-local modpath = minetest.get_modpath("catcommands")
+local modpath = core.get_modpath("catcommands")
 
-minetest.register_privilege("secret", "Wouldn't you like to know?")
-minetest.register_privilege("hidden_one", {description = "Can hide from players.", give_to_singleplayer=false})
+core.register_privilege("secret", "Wouldn't you like to know?")
+core.register_privilege("hidden_one", {description = "Can hide from players.", give_to_singleplayer=false})
 
 dofile(modpath .. "/api.lua")
 dofile(modpath .. "/monkey_patching.lua")
