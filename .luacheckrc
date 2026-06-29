@@ -3,9 +3,6 @@ allow_defined_top = true
 exclude_files = {".luacheckrc"}
 
 globals = {
-    "minetest",
-
-    --mod created
     "catcommands", "map",
 }
 
@@ -14,7 +11,7 @@ read_globals = {
     table = {fields = {"copy", "getn"}},
 
     -- Builtin
-    "vector", "ItemStack",
+    "vector", "ItemStack", "minetest", "core",
     "dump", "DIR_DELIM", "VoxelArea", "Settings",
 
     -- MTG
